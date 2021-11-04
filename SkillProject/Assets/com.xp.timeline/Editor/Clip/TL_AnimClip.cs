@@ -1,5 +1,4 @@
-﻿using Timeline.Data;
-using Timeline.Player;
+﻿using Timeline.Player;
 using Timeline.Track;
 using Timeline.View;
 using UnityEngine;
@@ -33,7 +32,7 @@ namespace Timeline.Clip
 
         private GameObject GetAnimGo()
         {
-            TL_AnimTrackView trackView = (TL_AnimTrackView)ClipView.Track;
+            TL_AnimTrackView trackView = ((TL_AnimClipView)View).Track as TL_AnimTrackView;
             return trackView.GetTrackGo();
         }
 
@@ -43,7 +42,7 @@ namespace Timeline.Clip
             if (go == null)
                 return;
 
-            TL_AnimClipData data = (TL_AnimClipData)ClipView.Data;
+            TL_AnimClipData data = (TL_AnimClipData)View.Data;
             string animName = data.animName;
             if (string.IsNullOrEmpty(animName))
                 return;
@@ -55,11 +54,9 @@ namespace Timeline.Clip
     /// <summary>
     /// 通用动画片段
     /// </summary>
+    [TimelineView(typeof(TL_AnimClipData), typeof(TL_AnimClipPlayer))]
     public class TL_AnimClipView : BaseClipView
     {
-        public override ClipData Data => new TL_AnimClipData();
-        public override BaseClipPlayer ClipPlayer => new TL_AnimClipPlayer(this);
-
         public override string DisplayName => ((TL_AnimClipData)Data).animName;
     }
 }

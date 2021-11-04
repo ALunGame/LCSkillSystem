@@ -1,5 +1,4 @@
-﻿using Timeline.Data;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -16,9 +15,11 @@ namespace Timeline.View
     /// <summary>
     /// 序列视图（一个序列包含多个轨道）
     /// </summary>
+    [TimelineView(typeof(SequenceData))]
     public class BaseSequenceView : BaseTimelineView
     {
         private static Color ColorBg = new Color(0.66f, 0.66f, 0.66f, 0.1f);
+
         //序列最后标识线
         private static Color ColorEndLine = new Color(0.8f, 0.1f, 0, 0.5f);
 
@@ -26,7 +27,6 @@ namespace Timeline.View
         public List<BaseTrackView> Tracklist = new List<BaseTrackView>();
 
         private GameObject SequenceRootGo;
-        public SequenceData Data;
         private float PlayTimer;
 
         public Rect SequenceViewRect;
@@ -49,24 +49,14 @@ namespace Timeline.View
 
         public override void OnInit()
         {
-            //Test
-            Data = new SequenceData();
-            for (int i = 0; i < 10; i++)
-            {
-                BaseTrackView trackView = new BaseTrackView();
-                trackView.Init(window);
-                trackView.Sequence = this;
-                trackView.TrackIndex = i;
-                Tracklist.Add(trackView);
-            }
         }
 
         public override void OnDraw()
         {
             //显示
-            SequenceViewRect        = window.TrackListSize;
+            SequenceViewRect = window.TrackListSize;
             SequenceViewRect.height = window.position.height - window.TrackListSize.y;
-            SequenceViewRect.width  = window.position.width - window.TrackListSize.x;
+            SequenceViewRect.width = window.position.width - window.TrackListSize.x;
 
             //绘制背景
             EditorGUI.DrawRect(SequenceViewRect, ColorBg);
@@ -94,9 +84,10 @@ namespace Timeline.View
         //绘制结束标识线
         private void DrawEndLine()
         {
+            SequenceData sequenceData = (SequenceData)Data;
             TimeAreaView timeAreaView = window.GetPartialView<TimeAreaView>();
-            float x = timeAreaView.TimeToPixel(Data.DurationTime);
-            if (Data.DurationTime > 1e-1 && x > 200)
+            float x = timeAreaView.TimeToPixel(sequenceData.DurationTime);
+            if (sequenceData.DurationTime > 1e-1 && x > 200)
             {
                 Rect rec = new Rect(x, timeAreaView.TimeContent.y, 1,
                     TracksBottommY - timeAreaView.TimeContent.y - 2);
@@ -113,6 +104,7 @@ namespace Timeline.View
                     if (SequenceViewRect.Contains(mousePos))
                         XPToolchains.Extension.EditorInspectorExtension.DrawObjectInInspector(Data);
                     break;
+
                 default:
                     break;
             }
@@ -125,12 +117,16 @@ namespace Timeline.View
         //同步数据
         private void SyncSequenceData()
         {
-            Data.DurationTime = CalcSequenceDurationTime();
+            SequenceData sequenceData = (SequenceData)Data;
+            sequenceData.DurationTime = CalcSequenceDurationTime();
         }
 
         public void AddTrackView(BaseTrackView track)
         {
-            //AddTrack(track, hierachy.Count, arg);
+            track.Init(window);
+            track.Sequence = this;
+            Tracklist.Add(track);
+            track.TrackIndex = Tracklist.Count - 1;
         }
 
         public float CalcSequenceDurationTime()
@@ -141,7 +137,9 @@ namespace Timeline.View
                 BaseTrackView trackView = Tracklist[i];
                 trackView.Cliplist.ForEach((clip) =>
                 {
-                    if (clip.Data.EndTime > dur) dur = clip.Data.EndTime;
+                    ClipData clipData = (ClipData)clip.Data;
+                    if (clipData.EndTime > dur)
+                        dur = clipData.EndTime;
                 });
             }
             return dur;

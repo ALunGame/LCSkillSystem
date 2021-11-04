@@ -1,31 +1,21 @@
-﻿using Timeline.Data;
-using Timeline.View;
-
-namespace Timeline.Player
+﻿namespace Timeline.Player
 {
     /// <summary>
     /// 基础技能片段播放器
     /// </summary>
-    public class BaseClipPlayer
+    public class BaseClipPlayer : BasePlayer
     {
-        private BaseClipView clipView;
         private bool isStart = false;
         protected double clipRunningTime;
         protected double clipLeftTime;
 
-        protected BaseClipView ClipView
+        public BaseClipPlayer(BaseTimelineView view) : base(view)
         {
-            get { return clipView; }
         }
 
-        public BaseClipPlayer(BaseClipView clipView)
+        public override void OnRunningTimeChange(double runningTime)
         {
-            this.clipView = clipView;
-        }
-
-        public void OnRunningTimeChange(double runningTime)
-        {
-            ClipData data = clipView.Data;
+            ClipData data = (ClipData)View.Data;
             clipRunningTime = runningTime - data.StartTime;
             clipLeftTime = data.EndTime - runningTime;
 

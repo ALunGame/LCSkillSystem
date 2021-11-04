@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Timeline.View;
-using Timeline.Data;
+﻿using Timeline.View;
 using UnityEngine;
+using Timeline.Clip;
 
 #if UNITY_EDITOR
 
@@ -20,9 +15,10 @@ namespace Timeline.Track
         public string goAssetPath;
     }
 
+    [TimelineView(typeof(TL_AnimTrackData))]
+    [TimelineTrack("动画轨道", typeof(TL_AnimClipView))]
     public class TL_AnimTrackView : BaseTrackView
     {
-        public override TrackData Data => new TL_AnimTrackData();
         public override string DisplayName => GetTrackGoName();
 
         public string GetTrackGoName()

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Timeline.Data;
+﻿using Timeline.Clip;
 using Timeline.View;
 using UnityEditor;
 using UnityEngine;
@@ -18,9 +13,10 @@ namespace Timeline.Track
     /// <summary>
     /// 节点显示隐藏轨道
     /// </summary>
+    [TimelineView(typeof(TL_ActiveTrackData))]
+    [TimelineTrack("显隐轨道", typeof(TL_ActiveClipView))]
     public class TL_ActiveTrackView : BaseTrackView
     {
-        public override TrackData Data => new TL_ActiveTrackData();
         public override string DisplayName => GetTrackGoName();
 
         public string GetTrackGoName()

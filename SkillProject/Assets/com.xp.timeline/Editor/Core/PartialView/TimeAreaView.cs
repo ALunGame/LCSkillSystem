@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Timeline.View
 {
     //时间线区域
-    public class TimeAreaView : BaseTimelineView
+    public class TimeAreaView : BaseView
     {
         public const float ARROW_WIDTH = 6f;
 

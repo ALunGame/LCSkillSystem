@@ -1,5 +1,4 @@
-﻿using Timeline.Data;
-using Timeline.Player;
+﻿using Timeline.Player;
 using Timeline.Track;
 using Timeline.View;
 using UnityEngine;
@@ -23,7 +22,7 @@ namespace Timeline.Clip
             if (go == null)
                 return;
 
-            TL_ActiveClipData data = (TL_ActiveClipData)ClipView.Data;
+            TL_ActiveClipData data = (TL_ActiveClipData)View.Data;
             go.SetActive(data.isActive);
         }
 
@@ -32,13 +31,13 @@ namespace Timeline.Clip
             GameObject go = GetAnimGo();
             if (go == null)
                 return;
-            TL_ActiveClipData data = (TL_ActiveClipData)ClipView.Data;
+            TL_ActiveClipData data = (TL_ActiveClipData)View.Data;
             go.SetActive(!data.isActive);
         }
 
         private GameObject GetAnimGo()
         {
-            TL_ActiveTrackView trackView = (TL_ActiveTrackView)ClipView.Track;
+            TL_ActiveTrackView trackView = ((TL_ActiveClipView)View).Track as TL_ActiveTrackView;
             return trackView.GetTrackGo();
         }
     }
@@ -46,11 +45,9 @@ namespace Timeline.Clip
     /// <summary>
     /// 节点显示隐藏片段
     /// </summary>
+    [TimelineView(typeof(TL_ActiveClipData), typeof(TL_ActivePlayer))]
     public class TL_ActiveClipView : BaseClipView
     {
-        public override ClipData Data => new TL_ActiveClipData();
-        public override BaseClipPlayer ClipPlayer => new TL_ActivePlayer(this);
-
         public override string DisplayName => ((TL_ActiveClipData)Data).isActive.ToString();
     }
 }

@@ -19,7 +19,7 @@ namespace Timeline
         public readonly Rect LeftTimeAreaSize = new Rect(220, 20, 0, 24);
         public readonly Rect RightTimeAreaSize = new Rect(0, 10, 280, 40);
 
-        private List<BaseTimelineView> PartialViews = new List<BaseTimelineView>() { new TopToolbarView(), new TimeAreaView(), new AddTrackView(), new BaseSequenceView() };
+        private List<BaseView> PartialViews = new List<BaseView>() { new TopToolbarView(), new TimeAreaView(), new AddTrackView() };
 
         public Rect WinArea { get; set; }
 
@@ -51,6 +51,9 @@ namespace Timeline
 
         public void Init()
         {
+            //Test
+            BaseSequenceView sequenceView = BaseTimelineView.CreateView<BaseSequenceView>();
+            AddPartialView(sequenceView);
             OnInit();
         }
 
@@ -101,8 +104,8 @@ namespace Timeline
                 {
                     RunningTime += delta;
                     BaseSequenceView sequenceView = GetPartialView<BaseSequenceView>();
-
-                    if (RunningTime >= sequenceView.Data.DurationTime)
+                    SequenceData sequenceData = (SequenceData)sequenceView.Data;
+                    if (RunningTime >= sequenceData.DurationTime)
                     {
                         RunningTime = 0;
                         //IsPlayingSkill = false;
@@ -123,12 +126,13 @@ namespace Timeline
 
         #region ½Ó¿Ú
 
-        public void AddPartialView(BaseTimelineView skillView)
+        public void AddPartialView(BaseView skillView)
         {
+            skillView.Init(this);
             PartialViews.Add(skillView);
         }
 
-        public T GetPartialView<T>() where T : BaseTimelineView
+        public T GetPartialView<T>() where T : BaseView
         {
             for (int i = 0; i < PartialViews.Count; i++)
             {
@@ -140,7 +144,7 @@ namespace Timeline
             return null;
         }
 
-        public void RemovePartialView<T>() where T : BaseTimelineView
+        public void RemovePartialView<T>() where T : BaseView
         {
             for (int i = 0; i < PartialViews.Count; i++)
             {

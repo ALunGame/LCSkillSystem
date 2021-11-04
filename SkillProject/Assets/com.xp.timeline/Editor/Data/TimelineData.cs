@@ -1,4 +1,4 @@
-﻿namespace Timeline.Data
+﻿namespace Timeline
 {
     public class SequenceData
     {

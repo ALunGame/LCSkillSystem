@@ -1,15 +1,38 @@
-﻿using Timeline.Data;
+﻿using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using XPToolchains.Help;
 using XPToolchains.Extension;
+using XPToolchains.Help;
 
 namespace Timeline.View
 {
     /// <summary>
+    /// 轨道属性
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
+    public class TimelineTrackAttribute : Attribute
+    {
+        public string menuName;
+
+        public Type clipViewType;
+
+        /// <summary>
+        /// 轨道属性
+        /// </summary>
+        /// <param name="menuName">创建菜单名</param>
+        /// <param name="clipType">片段类型</param>
+        public TimelineTrackAttribute(string menuName, Type clipType)
+        {
+            this.menuName = menuName;
+            this.clipViewType = clipType;
+        }
+    }
+
+    /// <summary>
     /// 轨道视图（一个轨道包含多个片段）
     /// </summary>
+    [TimelineView(typeof(TrackData))]
     public class BaseTrackView : BaseTimelineView
     {
         #region Static
@@ -48,25 +71,11 @@ namespace Timeline.View
         public int TrackIndex;
         public BaseSequenceView Sequence;
         public List<BaseClipView> Cliplist = new List<BaseClipView>();
-        public TrackData data;
-
-        public virtual TrackData Data
-        {
-            get
-            {
-                if (data == null)
-                    data = new TrackData();
-                return data;
-            }
-        }
 
         private bool IsSelected = false;
 
         public override void OnInit()
         {
-            //Test
-            BaseClipView clipView = new BaseClipView();
-            AddClipView(clipView);
         }
 
         public override void OnDraw()

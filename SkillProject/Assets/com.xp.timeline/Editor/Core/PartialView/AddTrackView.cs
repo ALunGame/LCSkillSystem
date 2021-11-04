@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using XPToolchains.Help;
 
 namespace Timeline.View
 {
     //添加轨道
-    public class AddTrackView : BaseTimelineView
+    public class AddTrackView : BaseView
     {
         private GUIContent AddContent;
 
@@ -29,7 +26,7 @@ namespace Timeline.View
             GUILayout.EndVertical();
         }
 
-        void AddButtonGUI()
+        private void AddButtonGUI()
         {
             if (EditorGUILayout.DropdownButton(AddContent, FocusType.Passive, "Dropdown"))
             {
@@ -40,20 +37,31 @@ namespace Timeline.View
         public void GenCustomMenu()
         {
             GenericMenu pm = new GenericMenu();
-            var paste = EditorGUIUtility.TrTextContent("粘贴\t #p");
-            pm.AddItem(paste, false, PasteTrack);
+
+            var trackList = ReflectionHelper.GetChildTypes<BaseTrackView>();
+            foreach (var item in trackList)
+            {
+                TimelineTrackAttribute trackAttribute = null;
+                if (AttributeHelper.TryGetTypeAttribute(item, out trackAttribute))
+                {
+                    string menuName = trackAttribute.menuName;
+                    var paste = EditorGUIUtility.TrTextContent(menuName);
+                    pm.AddItem(paste, false, () =>
+                    {
+                        OnAddTrackItem(item);
+                    });
+                }
+            }
 
             Rect rect = new Rect(Event.current.mousePosition, new Vector2(200, 0));
             pm.DropDown(rect);
         }
 
-        private void PasteTrack()
+        private void OnAddTrackItem(Type track)
         {
-        }
-
-        private void OnAddTrackItem(object arg)
-        {
-            Type type = (Type)arg;
+            BaseSequenceView sequenceView = window.GetPartialView<BaseSequenceView>();
+            BaseTimelineView trackView = BaseTimelineView.CreateView(track);
+            sequenceView.AddTrackView(trackView as BaseTrackView);
         }
     }
 }

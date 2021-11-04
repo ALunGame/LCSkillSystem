@@ -1,5 +1,4 @@
-﻿using Timeline.Data;
-using Timeline.Player;
+﻿using Timeline.Player;
 using UnityEditor;
 using UnityEngine;
 using XPToolchains.Extension;
@@ -9,8 +8,23 @@ namespace Timeline.View
 {
     public enum ClipDragMode { None, Drag, Left, Right }
 
+    /// <summary>
+    /// 片段视图（一个轨道包含多个片段）
+    /// </summary>
+    [TimelineView(typeof(ClipData), typeof(BaseClipPlayer))]
     public class BaseClipView : BaseTimelineView
     {
+        #region Display
+
+        public virtual Color UnSelectColor { get { return new Color32(109, 140, 171, 255); } }
+        public virtual Color SelectColor { get { return new Color32(158, 203, 247, 255); } }
+        public virtual Color DisplayNameColor { get { return new Color32(12, 24, 41, 255); } }
+        public virtual string DisplayName { get { return "Clip"; } }
+
+        #endregion Display
+
+        private ClipDragMode dragMode;
+
         public BaseTrackView Track;
 
         public Rect ShowRect;
@@ -19,43 +33,14 @@ namespace Timeline.View
 
         public bool IsSelected = false;
 
-        private ClipDragMode dragMode;
-
-        public virtual Color UnSelectColor { get { return new Color32(109, 140, 171, 255); } }
-        public virtual Color SelectColor { get { return new Color32(158, 203, 247, 255); } }
-        public virtual Color DisplayNameColor { get { return new Color32(12, 24, 41, 255); } }
-        public virtual string DisplayName { get { return "Clip"; } }
-
-        private ClipData data;
-
-        public virtual ClipData Data
-        {
-            get
-            {
-                if (data == null)
-                    data = new ClipData();
-                return data;
-            }
-        }
-
-        private BaseClipPlayer clipPlayer;
-
-        public virtual BaseClipPlayer ClipPlayer
-        {
-            get
-            {
-                if (clipPlayer == null)
-                    clipPlayer = new BaseClipPlayer(this);
-                return clipPlayer;
-            }
-        }
+        protected virtual ClipData clipData { get { return Data as ClipData; } }
+        protected virtual BaseClipPlayer clipPlayer { get { return Player as BaseClipPlayer; } }
 
         public override void OnInit()
         {
-            //Test
-            Data.StartTime = 1;
-            Data.EndTime = 10;
-            Data.DurationTime = Data.EndTime - Data.StartTime;
+            clipData.StartTime = 0;
+            clipData.EndTime = 1;
+            clipData.DurationTime = clipData.EndTime - clipData.StartTime;
         }
 
         public override void OnDraw()
@@ -65,8 +50,8 @@ namespace Timeline.View
 
             //显示区域
             ShowRect = Track.TrackViewRect;
-            ShowRect.x = timeAreaView.TimeToPixel(Data.StartTime);
-            float y = timeAreaView.TimeToPixel(Data.EndTime);
+            ShowRect.x = timeAreaView.TimeToPixel(clipData.StartTime);
+            float y = timeAreaView.TimeToPixel(clipData.EndTime);
             ShowRect.x = Mathf.Max(ShowRect.x, timeAreaRect.x);
             y = Mathf.Min(y, timeAreaRect.xMax);
             ShowRect.width = y - ShowRect.x;
@@ -153,7 +138,7 @@ namespace Timeline.View
 
         public override void OnRunningTimeChange(double runningTime)
         {
-            ClipPlayer.OnRunningTimeChange(runningTime);
+            clipPlayer.OnRunningTimeChange(runningTime);
         }
 
         #region 拖拽处理
@@ -179,14 +164,14 @@ namespace Timeline.View
         {
             TimeAreaView timeAreaView = window.GetPartialView<TimeAreaView>();
 
-            ShowRect.x = timeAreaView.TimeToPixel(Data.StartTime);
+            ShowRect.x = timeAreaView.TimeToPixel(clipData.StartTime);
             ShowRect.x += e.delta.x;
 
             var start2 = timeAreaView.PiexlToTime(ShowRect.x);
-            if (start2 >= 0 && start2 <= Data.EndTime)
+            if (start2 >= 0 && start2 <= clipData.EndTime)
             {
-                Data.DurationTime -= (start2 - Data.StartTime);
-                Data.StartTime = Mathf.Max(0, start2);
+                clipData.DurationTime -= (start2 - clipData.StartTime);
+                clipData.StartTime = Mathf.Max(0, start2);
                 e.Use();
             }
 
@@ -197,13 +182,13 @@ namespace Timeline.View
         {
             TimeAreaView timeAreaView = window.GetPartialView<TimeAreaView>();
 
-            ShowRect.x = timeAreaView.TimeToPixel(Data.EndTime);
+            ShowRect.x = timeAreaView.TimeToPixel(clipData.EndTime);
             ShowRect.x += e.delta.x;
 
             var end = timeAreaView.PiexlToTime(ShowRect.x);
-            if (end > Data.StartTime)
+            if (end > clipData.StartTime)
             {
-                Data.DurationTime += (end - Data.EndTime);
+                clipData.DurationTime += (end - clipData.EndTime);
                 e.Use();
             }
 
@@ -214,8 +199,8 @@ namespace Timeline.View
         {
             TimeAreaView timeAreaView = window.GetPartialView<TimeAreaView>();
             ShowRect.x += e.delta.x;
-            Data.StartTime = timeAreaView.PiexlToTime(ShowRect.x);
-            Data.StartTime = Mathf.Max(0, Data.StartTime);
+            clipData.StartTime = timeAreaView.PiexlToTime(ShowRect.x);
+            clipData.StartTime = Mathf.Max(0, clipData.StartTime);
             e.Use();
 
             OnDraging();
@@ -242,7 +227,7 @@ namespace Timeline.View
 
         private void SyncClipData()
         {
-            Data.EndTime = Data.StartTime + Data.DurationTime;
+            clipData.EndTime = clipData.StartTime + clipData.DurationTime;
         }
     }
 }

@@ -7,7 +7,7 @@ using XPToolchains.Help;
 /// <summary>
 /// 顶部工具栏
 /// </summary>
-public class TopToolbarView : BaseTimelineView
+public class TopToolbarView : BaseView
 {
     #region 播放操作UI元素
 
