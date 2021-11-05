@@ -1,11 +1,12 @@
 using System.Collections.Generic;
+using Timeline.Serialize;
 using Timeline.View;
 using UnityEditor;
 using UnityEngine;
 
 namespace Timeline
 {
-    public class TimelineEditorWindow : EditorWindow
+    public abstract class TimelineEditorWindow : EditorWindow
     {
         //上层工具窗口
         public readonly Rect ToolbarSize = new Rect(0, 0, 0, 10);
@@ -22,6 +23,8 @@ namespace Timeline
         private List<BaseView> PartialViews = new List<BaseView>() { new TopToolbarView(), new TimeAreaView(), new AddTrackView() };
 
         public Rect WinArea { get; set; }
+
+        public abstract string SavePath { get; }
 
         public bool IsPlayingSkill = false;
         public bool IsLockDragHeaderArrow = false;      //标尺锁定
@@ -52,9 +55,6 @@ namespace Timeline
         public void Init()
         {
             //Test
-            BaseSequenceView sequenceView = BaseTimelineView.CreateView<BaseSequenceView>();
-            AddPartialView(sequenceView);
-            OnInit();
         }
 
         public void OnEnable()
@@ -162,6 +162,35 @@ namespace Timeline
                 return;
 
             IsPlayingSkill = reqPlay;
+        }
+
+        //加载时间轴
+        public void LoadTimeline(string filePath)
+        {
+            SequenceData sequenceData = TimelineSerialize.Load(filePath);
+            if (sequenceData == null)
+                return;
+            RemovePartialView<BaseSequenceView>();
+            BaseSequenceView sequenceView = BaseTimelineView.CreateView<BaseSequenceView>();
+            sequenceView.SetData(sequenceData);
+            AddPartialView(sequenceView);
+        }
+
+        //创建时间轴
+        public void CreateTimeline(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+            TopToolbarView topToolbarView = GetPartialView<TopToolbarView>();
+            if (topToolbarView.CheckHasTimeline(name))
+            {
+                Debug.LogError($"配置名重复:{name}");
+                return;
+            }
+            RemovePartialView<BaseSequenceView>();
+            BaseSequenceView sequenceView = BaseTimelineView.CreateView<BaseSequenceView>();
+            ((SequenceData)sequenceView.Data).Name = name;
+            AddPartialView(sequenceView);
         }
 
         #endregion 接口

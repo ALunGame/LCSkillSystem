@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Timeline;
+using Timeline.Serialize;
+using Timeline.View;
 using UnityEditor;
 using UnityEngine;
 using XPToolchains.Help;
@@ -63,7 +67,7 @@ public class TopToolbarView : BaseView
         });
 
         GUILayout.FlexibleSpace();
-        GUILayout.Label("Test");
+        GUILayout.Label(GetTimelineName());
         GUILayout.FlexibleSpace();
 
         EDLayout.CreateHorizontal("", HorWidth, window.ToolbarSize.height, () =>
@@ -118,20 +122,82 @@ public class TopToolbarView : BaseView
     {
         if (GUILayout.Button(NewContent, EditorStyles.toolbarButton))
         {
+            EDPopPanel.PopWindow("ÊäÈëÅäÖÃÃû", (string name) =>
+            {
+                window.CreateTimeline(name);
+            });
             OnClickNewFileFunc?.Invoke();
             GUIUtility.ExitGUI();
         }
 
         if (GUILayout.Button(OpenContent, EditorStyles.toolbarButton))
         {
+            DrawTimelineList();
             OnClickOpenFileFunc?.Invoke();
             GUIUtility.ExitGUI();
         }
 
         if (GUILayout.Button(SaveContent, EditorStyles.toolbarButton))
         {
+            BaseSequenceView sequenceView = window.GetPartialView<BaseSequenceView>();
+            if (sequenceView != null)
+            {
+                TimelineSerialize.Save((SequenceData)sequenceView.Data, window.SavePath);
+                AssetDatabase.Refresh();
+            }
+
             OnClickSaveFileFunc?.Invoke();
             GUIUtility.ExitGUI();
         }
+    }
+
+    private void DrawTimelineList()
+    {
+        List<string> filePathList = GetTimlineFilePaths();
+
+        GenericMenu pm = new GenericMenu();
+
+        for (int i = 0; i < filePathList.Count; i++)
+        {
+            string filePath = filePathList[i];
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            var paste = EditorGUIUtility.TrTextContent(fileName);
+            pm.AddItem(paste, false, () =>
+            {
+                window.LoadTimeline(filePath);
+            });
+        }
+        Rect rect = new Rect(Event.current.mousePosition, new Vector2(200, 0));
+        pm.DropDown(rect);
+    }
+
+    public List<string> GetTimlineFilePaths()
+    {
+        List<string> filePathList = new List<string>();
+        filePathList.AddRange(Directory.GetFiles(window.SavePath, "*" + TimelineSerialize.TimelineAssetExNam, SearchOption.AllDirectories));
+        return filePathList;
+    }
+
+    public bool CheckHasTimeline(string name)
+    {
+        List<string> filePathList = GetTimlineFilePaths();
+        for (int i = 0; i < filePathList.Count; i++)
+        {
+            string filePath = filePathList[i];
+            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            if (fileName == name)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public string GetTimelineName()
+    {
+        BaseSequenceView sequenceView = window.GetPartialView<BaseSequenceView>();
+        if (sequenceView == null)
+            return "";
+        return ((SequenceData)sequenceView.Data).Name;
     }
 }

@@ -126,7 +126,15 @@ namespace Timeline.View
             track.Init(window);
             track.Sequence = this;
             Tracklist.Add(track);
-            track.TrackIndex = Tracklist.Count - 1;
+            RefreshTrackIndex();
+        }
+
+        public void RefreshTrackIndex()
+        {
+            for (int i = 0; i < Tracklist.Count; i++)
+            {
+                Tracklist[i].TrackIndex = i;
+            }
         }
 
         public float CalcSequenceDurationTime()

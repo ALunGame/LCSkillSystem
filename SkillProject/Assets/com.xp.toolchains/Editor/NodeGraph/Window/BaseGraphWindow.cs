@@ -11,7 +11,7 @@ namespace XPToolchains.NodeGraph
 {
     public abstract class BaseGraphWindow : EditorWindow
     {
-        readonly string graphWindowStyle = "BaseGraphView";
+        private readonly string graphWindowStyle = "BaseGraphView";
 
         public VisualElement rootView;
         protected BaseGraphView graphView;
@@ -24,12 +24,15 @@ namespace XPToolchains.NodeGraph
 
         //当前视图数据
         public BaseGraph selGraph;
+
         public Dictionary<string, BaseGraph> graphDict = new Dictionary<string, BaseGraph>();
+
         //当前目录下所有的视图
         public string selGraphPath = "";
 
         //保存读取路径
         public abstract string BackVerPath { get; }
+
         //版本回退路径
         public abstract string SavePath { get; }
 
@@ -43,7 +46,7 @@ namespace XPToolchains.NodeGraph
             get { return graphView != null && graphView.graph != null; }
         }
 
-        void InitRootView()
+        private void InitRootView()
         {
             rootView = base.rootVisualElement;
 
@@ -52,7 +55,7 @@ namespace XPToolchains.NodeGraph
             rootView.styleSheets.Add(NodeGraphDefine.LoadUSS(graphWindowStyle));
         }
 
-        void InitListView()
+        private void InitListView()
         {
             graphListView = new GraphListView();
             //查找所有文件
@@ -67,7 +70,7 @@ namespace XPToolchains.NodeGraph
             selGraphPath = "";
             graphView = null;
 
-            TaskHelp.AddTaskOneParam<List<string>, Dictionary<string, BaseGraph>>(graphFilePathList, RollbackHelper.GetGraphDict, (ver) =>
+            TaskHelp.AddTaskOneParam(graphFilePathList, RollbackHelper.GetGraphDict, (ver) =>
               {
                   AddOtherViews();
                   rollbackView.visible = false;
@@ -81,12 +84,12 @@ namespace XPToolchains.NodeGraph
             //graphListView.Init(this);
         }
 
-        void InitToolbarView()
+        private void InitToolbarView()
         {
             toolbarView = new ToolbarView();
         }
 
-        void InitRollbackView()
+        private void InitRollbackView()
         {
             rollbackView = new RollbackView(this);
         }
@@ -104,7 +107,7 @@ namespace XPToolchains.NodeGraph
         {
             if (string.IsNullOrEmpty(graphFilePath) || !graphDict.ContainsKey(graphFilePath))
                 return;
-            if (graphFilePath==selGraphPath)
+            if (graphFilePath == selGraphPath)
                 return;
 
             if (selGraph != null)
@@ -182,7 +185,9 @@ namespace XPToolchains.NodeGraph
             updateAction?.Invoke();
         }
 
-        protected virtual void OnDisable() { }
+        protected virtual void OnDisable()
+        {
+        }
 
         protected virtual void OnDestroy()
         {
@@ -206,7 +211,7 @@ namespace XPToolchains.NodeGraph
 
         public abstract void SerializeGraph(Dictionary<string, BaseGraph> graphDict);
 
-        #endregion
+        #endregion 子类重写
 
         #region 数据操作
 
@@ -267,6 +272,6 @@ namespace XPToolchains.NodeGraph
             AssetDatabase.Refresh();
         }
 
-        #endregion
+        #endregion 数据操作
     }
 }

@@ -1,4 +1,5 @@
-﻿using Timeline.Player;
+﻿using System;
+using Timeline.Player;
 using UnityEditor;
 using UnityEngine;
 using XPToolchains.Extension;
@@ -6,6 +7,24 @@ using XPToolchains.Help;
 
 namespace Timeline.View
 {
+    /// <summary>
+    /// 片段属性
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
+    public class TimelineClipAttribute : Attribute
+    {
+        public string menuName;
+
+        /// <summary>
+        /// 轨道属性
+        /// </summary>
+        /// <param name="menuName">创建菜单名</param>
+        public TimelineClipAttribute(string menuName)
+        {
+            this.menuName = menuName;
+        }
+    }
+
     public enum ClipDragMode { None, Drag, Left, Right }
 
     /// <summary>

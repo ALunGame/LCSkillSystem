@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using Timeline;
 using UnityEditor;
 using UnityEngine;
@@ -8,10 +6,12 @@ namespace LCSkill
 {
     public class SkillEditorWindow : TimelineEditorWindow
     {
+        public override string SavePath => "Assets/SkillSystem/EDData/";
+
         [MenuItem("Skill/編輯", false, 1)]
         public static void ShowWindow()
         {
-            SkillEditorWindow window = GetWindow<SkillEditorWindow>(false, "技能編輯", true);
+            SkillEditorWindow window = GetWindow<SkillEditorWindow>(true, "技能編輯", true);
             window.minSize = new Vector2(400, 300);
         }
     }

@@ -61,6 +61,11 @@ namespace Timeline
             }
         }
 
+        public void SetData(object _data)
+        {
+            data = _data;
+        }
+
         public static BaseTimelineView CreateView(Type viewType)
         {
             TimelineViewAttribute viewAttribute;

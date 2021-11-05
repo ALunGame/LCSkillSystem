@@ -12,8 +12,8 @@ namespace XPToolchains.Extension
 {
     public static partial class EditorGUILayoutExtension
     {
-        /// <summary> 
-        /// 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。 
+        /// <summary>
+        /// 不是<see cref="private"/>、或者标记了<see cref="SerializeField"/>特性，并且没有标记<see cref="NonSerializedAttribute"/>特性，并且没有标记<see cref="HideInInspector"/>特性。
         /// </summary>
         /// <returns> 满足以上条件返回<see cref="true"/> </returns>
         public static bool CanDraw(FieldInfo _fieldInfo)
@@ -81,23 +81,23 @@ namespace XPToolchains.Extension
 
         #region Private
 
-        const string c_EditorPrefsFoldoutKey = "XPToolchains.Extension.Foldout.";
+        private const string c_EditorPrefsFoldoutKey = "XPToolchains.Extension.Foldout.";
 
-        static int currentKeyboardControl = -1;
+        private static int currentKeyboardControl = -1;
 
-        static bool editingArray = false;
+        private static bool editingArray = false;
 
-        static int savedArraySize = -1;
+        private static int savedArraySize = -1;
 
-        static int editingFieldHash;
+        private static int editingFieldHash;
 
-        static HashSet<int> drawnObjects = new HashSet<int>();
+        private static HashSet<int> drawnObjects = new HashSet<int>();
 
-        static string[] layerNames;
+        private static string[] layerNames;
 
-        static int[] maskValues;
+        private static int[] maskValues;
 
-        static void InitLayers()
+        private static void InitLayers()
         {
             List<string> list = new List<string>();
             List<int> list2 = new List<int>();
@@ -115,7 +115,7 @@ namespace XPToolchains.Extension
         }
 
         //绘制集合类型
-        static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
+        private static object DrawArrayField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
             Type elementType;
             if (_fieldType.IsArray)
@@ -183,7 +183,6 @@ namespace XPToolchains.Extension
                                     {
                                         break;
                                     }
-
                                 }
                             }
                             else
@@ -261,8 +260,9 @@ namespace XPToolchains.Extension
             }
             return list;
         }
+
         /// <summary> 绘制内部所有字段 </summary>
-        static object DrawFields(object _object)
+        private static object DrawFields(object _object)
         {
             if (_object == null) return null;
 
@@ -282,17 +282,18 @@ namespace XPToolchains.Extension
             return _object;
         }
 
-        static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
+        private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
             if (AttributeHelper.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
                 || AttributeHelper.TryGetTypeAttribute(_fieldType, out att))
             {
                 ObjectDrawer objectDrawer;
-                if ((objectDrawer = ObjectDrawerPool.GetObjectDrawer(att)) != null)
+                if ((objectDrawer = ObjectDrawerPool.GetObjectDrawer(_fieldInfo)) != null)
                 {
                     objectDrawer.Target = _value;
                     objectDrawer.FieldInfo = _fieldInfo;
                     objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), _content);
+                    _value = objectDrawer.Target;
                     return _value;
                 }
             }
@@ -449,7 +450,7 @@ namespace XPToolchains.Extension
             return null;
         }
 
-        static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
+        private static LayerMask DrawLayerMask(GUIContent guiContent, LayerMask layerMask)
         {
             if (layerNames == null)
             {
@@ -479,6 +480,6 @@ namespace XPToolchains.Extension
             return layerMask;
         }
 
-        #endregion
+        #endregion Private
     }
 }

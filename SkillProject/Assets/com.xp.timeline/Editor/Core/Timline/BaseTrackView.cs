@@ -74,6 +74,39 @@ namespace Timeline.View
 
         private bool IsSelected = false;
 
+        /// <summary>
+        /// 右键菜单
+        /// </summary>
+        private void GenRightClickMenu()
+        {
+            GenericMenu pm = new GenericMenu();
+
+            TimelineTrackAttribute trackAttribute = null;
+            if (AttributeHelper.TryGetTypeAttribute(GetType(), out trackAttribute))
+            {
+                Type clipType = trackAttribute.clipViewType;
+                TimelineClipAttribute clipAttribute = null;
+                if (AttributeHelper.TryGetTypeAttribute(clipType, out clipAttribute))
+                {
+                    string menuName = clipAttribute.menuName;
+                    var paste = EditorGUIUtility.TrTextContent(menuName);
+                    pm.AddItem(paste, false, () =>
+                    {
+                        CreateClipView(clipType);
+                    });
+                }
+            }
+
+            Rect rect = new Rect(Event.current.mousePosition, new Vector2(200, 0));
+            pm.DropDown(rect);
+        }
+
+        private void CreateClipView(Type clipType)
+        {
+            BaseClipView clipView = CreateView(clipType) as BaseClipView;
+            AddClipView(clipView);
+        }
+
         public override void OnInit()
         {
         }
@@ -105,12 +138,20 @@ namespace Timeline.View
             switch (evt.type)
             {
                 case EventType.MouseDown:
-                    IsSelected = false;
                     if (TrackViewRect.Contains(mousePos))
                     {
                         IsSelected = true;
                         OnSelect();
+                        if (Event.current.button == 1)
+                        {
+                            GenRightClickMenu();
+                        }
                     }
+                    else
+                    {
+                        IsSelected = false;
+                    }
+
                     break;
 
                 default:
@@ -131,11 +172,16 @@ namespace Timeline.View
             }
         }
 
+        public virtual void OnAddClipView(BaseClipView clipView)
+        {
+        }
+
         public void AddClipView(BaseClipView clipView)
         {
             clipView.Init(window);
             clipView.Track = this;
             Cliplist.Add(clipView);
+            OnAddClipView(clipView);
         }
     }
 }

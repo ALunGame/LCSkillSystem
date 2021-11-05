@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using XPToolchains.Extension;
 using XPToolchains.Help;
+
 using UnityObject = UnityEngine.Object;
 
 namespace XPToolchains.Core
@@ -16,11 +15,14 @@ namespace XPToolchains.Core
     /// 自定义类型绘制
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
-    public class CustomObjectDrawerAttribute : Attribute
+    public sealed class CustomObjectDrawerAttribute : Attribute
     {
         public Type targetType;
 
-        public CustomObjectDrawerAttribute(Type _targetType) { targetType = _targetType; }
+        public CustomObjectDrawerAttribute(Type _targetType)
+        {
+            targetType = _targetType;
+        }
     }
 
     /// <summary>
@@ -29,15 +31,18 @@ namespace XPToolchains.Core
     [AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
     public sealed class CustomFieldDrawerAttribute : Attribute
     {
-        Type type;
+        private Type type;
 
         public Type Type { get { return type; } }
 
-        public CustomFieldDrawerAttribute(Type _type) { type = _type; }
+        public CustomFieldDrawerAttribute(Type _type)
+        {
+            type = _type;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Interface, Inherited = true)]
-    public abstract class FieldAttribute : Attribute { }
+    public sealed class FieldAttribute : Attribute { }
 
     /// <summary>
     /// EditorGUI面板绘制器
@@ -46,14 +51,14 @@ namespace XPToolchains.Core
     {
         #region Static
 
-        static Dictionary<Type, Type> ObjectEditorTypeCache;
+        private static Dictionary<Type, Type> ObjectEditorTypeCache;
 
         static ObjectDrawer()
         {
             BuildCache();
         }
 
-        static void BuildCache()
+        private static void BuildCache()
         {
             ObjectEditorTypeCache = new Dictionary<Type, Type>();
 
@@ -72,7 +77,7 @@ namespace XPToolchains.Core
             return false;
         }
 
-        static ObjectDrawer InternalCreateEditor(object _targetObject)
+        private static ObjectDrawer InternalCreateEditor(object _targetObject)
         {
             if (_targetObject == null) return null;
 
@@ -98,27 +103,28 @@ namespace XPToolchains.Core
             return objectEditor;
         }
 
-        #endregion
+        #endregion Static
 
-        protected ObjectDrawer() { }
+        protected ObjectDrawer()
+        {
+        }
 
         public FieldInfo FieldInfo { get; set; }
         public FieldAttribute Attribute { get; set; }
         public object Target { get; set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
-        void Init(object _target)
+        private void Init(object _target)
         {
             Target = _target;
             Fields = ReflectionHelper.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
 
-        void Init(object _target, FieldInfo _field)
+        private void Init(object _target, FieldInfo _field)
         {
             Target = _target;
             Fields = ReflectionHelper.GetFieldInfos(Target.GetType()).Where(field => EditorGUILayoutExtension.CanDraw(field)).ToList();
         }
-
 
         public virtual void OnGUI(Rect _position, GUIContent _label)
         {

@@ -31,7 +31,7 @@ namespace Timeline.Track
 
         public GameObject GetTrackGo()
         {
-            var data = (TL_AnimTrackData)Data;
+            var data = (TL_ActiveTrackData)Data;
             if (string.IsNullOrEmpty(data.goAssetPath))
                 return null;
             GameObject go = AssetDatabase.LoadAssetAtPath<GameObject>(data.goAssetPath);

@@ -45,6 +45,7 @@ namespace Timeline.Clip
     /// <summary>
     /// 节点显示隐藏片段
     /// </summary>
+    [TimelineClip("显示隐藏片段")]
     [TimelineView(typeof(TL_ActiveClipData), typeof(TL_ActivePlayer))]
     public class TL_ActiveClipView : BaseClipView
     {

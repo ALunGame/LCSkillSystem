@@ -54,6 +54,7 @@ namespace Timeline.Clip
     /// <summary>
     /// 通用动画片段
     /// </summary>
+    [TimelineClip("通用动画片段")]
     [TimelineView(typeof(TL_AnimClipData), typeof(TL_AnimClipPlayer))]
     public class TL_AnimClipView : BaseClipView
     {
