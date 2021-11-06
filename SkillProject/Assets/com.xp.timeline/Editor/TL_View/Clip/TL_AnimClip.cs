@@ -6,11 +6,6 @@ using XPToolchains.Help;
 
 namespace Timeline.Clip
 {
-    public class TL_AnimClipData : ClipData
-    {
-        public string animName;
-    }
-
     public class TL_AnimClipPlayer : BaseClipPlayer
     {
         public TL_AnimClipPlayer(BaseClipView clipView) : base(clipView)

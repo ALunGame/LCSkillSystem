@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -49,6 +50,12 @@ namespace Timeline.View
 
         public override void OnInit()
         {
+            SequenceData data = (SequenceData)Data;
+            for (int i = 0; i < data.Tracks.Count; i++)
+            {
+                BaseTrackView trackView = CreateView(data.Tracks[i]) as BaseTrackView;
+                AddTrackView(trackView, false);
+            }
         }
 
         public override void OnDraw()
@@ -102,7 +109,7 @@ namespace Timeline.View
             {
                 case EventType.MouseDown:
                     if (SequenceViewRect.Contains(mousePos))
-                        XPToolchains.Extension.EditorInspectorExtension.DrawObjectInInspector(Data);
+                        OnSelect();
                     break;
 
                 default:
@@ -114,6 +121,11 @@ namespace Timeline.View
             }
         }
 
+        public virtual void OnSelect()
+        {
+            XPToolchains.Extension.EditorInspectorExtension.DrawObjectInInspector(Data);
+        }
+
         //同步数据
         private void SyncSequenceData()
         {
@@ -121,15 +133,7 @@ namespace Timeline.View
             sequenceData.DurationTime = CalcSequenceDurationTime();
         }
 
-        public void AddTrackView(BaseTrackView track)
-        {
-            track.Init(window);
-            track.Sequence = this;
-            Tracklist.Add(track);
-            RefreshTrackIndex();
-        }
-
-        public void RefreshTrackIndex()
+        private void RefreshTrackIndex()
         {
             for (int i = 0; i < Tracklist.Count; i++)
             {
@@ -137,7 +141,7 @@ namespace Timeline.View
             }
         }
 
-        public float CalcSequenceDurationTime()
+        private float CalcSequenceDurationTime()
         {
             float dur = 0;
             for (int i = 0; i < Tracklist.Count; i++)
@@ -152,5 +156,37 @@ namespace Timeline.View
             }
             return dur;
         }
+
+        #region 接口
+
+        public void AddTrackView(BaseTrackView track, bool savaData = true)
+        {
+            track.Init(window);
+            track.Sequence = this;
+            Tracklist.Add(track);
+            RefreshTrackIndex();
+            if (savaData)
+            {
+                SequenceData data = (SequenceData)Data;
+                data.Tracks.Add((TrackData)track.Data);
+            }
+        }
+
+        public void RemoveTrackView(BaseTrackView track)
+        {
+            for (int i = 0; i < Tracklist.Count; i++)
+            {
+                if (Tracklist[i].Equals(track))
+                {
+                    Tracklist.RemoveAt(i);
+                    break;
+                }
+            }
+            SequenceData data = (SequenceData)Data;
+            data.Tracks.Remove((TrackData)track.Data);
+            RefreshTrackIndex();
+        }
+
+        #endregion 接口
     }
 }

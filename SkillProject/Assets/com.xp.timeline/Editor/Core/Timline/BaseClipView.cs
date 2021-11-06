@@ -57,9 +57,6 @@ namespace Timeline.View
 
         public override void OnInit()
         {
-            clipData.StartTime = 0;
-            clipData.EndTime = 1;
-            clipData.DurationTime = clipData.EndTime - clipData.StartTime;
         }
 
         public override void OnDraw()
@@ -140,6 +137,10 @@ namespace Timeline.View
                     {
                         IsSelected = true;
                         OnSelect();
+                        if (Event.current.button == 1)
+                        {
+                            GenRightClickMenu();
+                        }
                         evt.Use();
                     }
                     dragMode = ClipDragMode.None;
@@ -226,6 +227,40 @@ namespace Timeline.View
         }
 
         #endregion 拖拽处理
+
+        /// <summary>
+        /// 右键菜单
+        /// </summary>
+        private void GenRightClickMenu()
+        {
+            GenericMenu pm = new GenericMenu();
+
+            //删除
+            var delPaste = EditorGUIUtility.TrTextContent("删除");
+            pm.AddItem(delPaste, false, () =>
+            {
+                Track.RemoveClipView(this);
+            });
+
+            //复制
+            var copyPaste = EditorGUIUtility.TrTextContent("复制");
+            pm.AddItem(copyPaste, false, () =>
+            {
+                CopyView();
+            });
+
+            Rect rect = new Rect(Event.current.mousePosition, new Vector2(200, 0));
+            pm.DropDown(rect);
+        }
+
+        private void CopyView()
+        {
+            BaseTimelineView clipView = CreateView(GetType());
+            clipView.SetData(Data);
+            ClipData clipData = (ClipData)clipView.Data;
+            clipData.StartTime += 1;
+            Track.AddClipView((BaseClipView)clipView);
+        }
 
         public virtual void OnSelect()
         {

@@ -1,6 +1,6 @@
-﻿using XPToolchains.Core;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;
+using XPToolchains;
 
 namespace Timeline
 {
@@ -22,12 +22,14 @@ namespace Timeline
         [UnityAssetType(typeof(GameObject), true)]
         public UnityObjectAsset Go;
 
-        public List<TrackData> Tracks;
+        [HideInInspector]
+        public List<TrackData> Tracks = new List<TrackData>();
     }
 
     public class TrackData
     {
-        public List<ClipData> Clips;
+        [HideInInspector]
+        public List<ClipData> Clips = new List<ClipData>();
     }
 
     public class ClipData

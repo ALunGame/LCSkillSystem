@@ -10,26 +10,11 @@ using UnityEditor;
 
 namespace Timeline.Track
 {
-    public class TL_AnimTrackData : TrackData
-    {
-        public string goAssetPath;
-    }
-
     [TimelineView(typeof(TL_AnimTrackData))]
-    [TimelineTrack("动画轨道", typeof(TL_AnimClipView))]
+    [TimelineTrack("通用动画轨道", typeof(TL_AnimClipView))]
     public class TL_AnimTrackView : BaseTrackView
     {
-        public override string DisplayName => GetTrackGoName();
-
-        public string GetTrackGoName()
-        {
-            GameObject go = GetTrackGo();
-            if (go == null)
-            {
-                return "默认节点";
-            }
-            return go.name;
-        }
+        public override string DisplayName => "通用动画轨道";
 
         public GameObject GetTrackGo()
         {

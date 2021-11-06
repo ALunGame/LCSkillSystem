@@ -9,7 +9,6 @@ namespace XPToolchains.Core
 {
     public class ObjectDrawerPool
     {
-
         private static Dictionary<Type, Type> objectDrawerTypeMap = new Dictionary<Type, Type>();
 
         private static Dictionary<int, ObjectDrawer> objectDrawerMap = new Dictionary<int, ObjectDrawer>();
@@ -48,11 +47,16 @@ namespace XPToolchains.Core
         private static bool ObjectDrawerForType(Type _fieldType, ref ObjectDrawer _fieldDrawer, ref Type _fieldDrawerType, int _hash)
         {
             ObjectDrawerPool.BuildObjectDrawers();
-            if (!ObjectDrawerPool.objectDrawerTypeMap.ContainsKey(_fieldType))
+            if (!ObjectDrawerPool.objectDrawerTypeMap.ContainsKey(_fieldType) && !ObjectDrawer.CheckHasCustomDrawer(_fieldType))
             {
                 return false;
             }
-            _fieldDrawerType = ObjectDrawerPool.objectDrawerTypeMap[_fieldType];
+
+            if (ObjectDrawerPool.objectDrawerTypeMap.ContainsKey(_fieldType))
+                _fieldDrawerType = ObjectDrawerPool.objectDrawerTypeMap[_fieldType];
+            if (ObjectDrawer.CheckHasCustomDrawer(_fieldType))
+                _fieldDrawerType = ObjectDrawer.GetEditorType(_fieldType);
+
             if (ObjectDrawerPool.objectDrawerMap.ContainsKey(_hash))
             {
                 _fieldDrawer = ObjectDrawerPool.objectDrawerMap[_hash];
@@ -75,7 +79,7 @@ namespace XPToolchains.Core
             return objectDrawer;
         }
 
-        public static ObjectDrawer GetObjectDrawer(FieldAttribute attribute)
+        public static ObjectDrawer GetObjectDrawer(FieldDrawerAttribute attribute)
         {
             ObjectDrawer objectDrawer = null;
             Type type = null;

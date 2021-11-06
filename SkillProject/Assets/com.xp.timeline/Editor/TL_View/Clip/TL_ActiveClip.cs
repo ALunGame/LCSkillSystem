@@ -5,11 +5,6 @@ using UnityEngine;
 
 namespace Timeline.Clip
 {
-    public class TL_ActiveClipData : ClipData
-    {
-        public bool isActive;
-    }
-
     public class TL_ActivePlayer : BaseClipPlayer
     {
         public TL_ActivePlayer(BaseClipView clipView) : base(clipView)

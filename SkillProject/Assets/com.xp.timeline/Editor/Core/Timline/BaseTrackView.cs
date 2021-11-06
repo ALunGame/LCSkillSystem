@@ -81,6 +81,20 @@ namespace Timeline.View
         {
             GenericMenu pm = new GenericMenu();
 
+            //删除
+            var delPaste = EditorGUIUtility.TrTextContent("删除");
+            pm.AddItem(delPaste, false, () =>
+            {
+                Sequence.RemoveTrackView(this);
+            });
+
+            //复制
+            var copyPaste = EditorGUIUtility.TrTextContent("复制");
+            pm.AddItem(copyPaste, false, () =>
+            {
+                CopyView();
+            });
+
             TimelineTrackAttribute trackAttribute = null;
             if (AttributeHelper.TryGetTypeAttribute(GetType(), out trackAttribute))
             {
@@ -104,11 +118,28 @@ namespace Timeline.View
         private void CreateClipView(Type clipType)
         {
             BaseClipView clipView = CreateView(clipType) as BaseClipView;
+            ClipData clipData = (ClipData)clipView.Data;
+            clipData.StartTime = 0;
+            clipData.EndTime = 1;
+            clipData.DurationTime = clipData.EndTime - clipData.StartTime;
             AddClipView(clipView);
+        }
+
+        private void CopyView()
+        {
+            BaseTimelineView trackView = CreateView(GetType());
+            trackView.SetData(Data);
+            Sequence.AddTrackView((BaseTrackView)trackView);
         }
 
         public override void OnInit()
         {
+            TrackData data = (TrackData)Data;
+            for (int i = 0; i < data.Clips.Count; i++)
+            {
+                BaseClipView clipView = CreateView(data.Clips[i]) as BaseClipView;
+                AddClipView(clipView, false);
+            }
         }
 
         public override void OnDraw()
@@ -176,12 +207,31 @@ namespace Timeline.View
         {
         }
 
-        public void AddClipView(BaseClipView clipView)
+        public void AddClipView(BaseClipView clipView, bool savaData = true)
         {
             clipView.Init(window);
             clipView.Track = this;
             Cliplist.Add(clipView);
             OnAddClipView(clipView);
+            if (savaData)
+            {
+                TrackData data = (TrackData)Data;
+                data.Clips.Add((ClipData)clipView.Data);
+            }
+        }
+
+        public void RemoveClipView(BaseClipView clipView)
+        {
+            for (int i = 0; i < Cliplist.Count; i++)
+            {
+                if (Cliplist[i].Equals(clipView))
+                {
+                    Cliplist.RemoveAt(i);
+                    break;
+                }
+            }
+            TrackData data = (TrackData)Data;
+            data.Clips.Remove((ClipData)clipView.Data);
         }
     }
 }

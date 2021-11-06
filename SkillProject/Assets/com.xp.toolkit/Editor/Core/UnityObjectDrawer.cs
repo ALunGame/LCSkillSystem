@@ -8,81 +8,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace XPToolchains.Core
 {
-    /// <summary>
-    /// Unity内部资源
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class UnityAssetTypeAttribute : Attribute
-    {
-        private Type objType;
-
-        public Type ObjType { get { return objType; } }
-
-        private bool sceneObj;
-
-        public bool SceneObj { get { return sceneObj; } }
-
-        /// <summary>
-        /// Unity内部资源
-        /// </summary>
-        public UnityAssetTypeAttribute(Type _type, bool _sceneObj)
-        {
-            objType = _type;
-            sceneObj = _sceneObj;
-        }
-    }
-
-    [Field]
-    public class UnityObjectAsset
-    {
-        [Json.JsonIgnore]
-        public UnityObject Obj;
-
-        public string ObjPath;
-
-        public UnityObject GetObj(Type objType, bool sceneObj)
-        {
-            if (string.IsNullOrEmpty(ObjPath))
-                return null;
-            if (sceneObj)
-            {
-                Scene scene = EditorSceneManager.GetActiveScene();
-                GameObject[] rootGos = scene.GetRootGameObjects();
-                for (int i = 0; i < rootGos.Length; i++)
-                {
-                    GameObject rootGo = rootGos[i];
-                    if (ObjPath.Contains(rootGo.name))
-                    {
-                        Transform targetTrans = null;
-                        if (!ObjPath.Contains("/"))
-                            targetTrans = rootGo.transform;
-                        else
-                        {
-                            int index = ObjPath.IndexOf('/') + 1;
-                            string leftPath = ObjPath.Substring(index, ObjPath.Length - index);
-                            targetTrans = rootGo.transform.Find(leftPath);
-                        }
-
-                        if (targetTrans != null)
-                        {
-                            if (objType == typeof(GameObject))
-                                return targetTrans.gameObject;
-                            else
-
-                                return targetTrans.GetComponent(objType);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                return AssetDatabase.LoadAssetAtPath(ObjPath, objType);
-            }
-            return null;
-        }
-    }
-
-    [CustomFieldDrawer(typeof(UnityObjectAsset))]
+    [CustomObjectDrawer(typeof(UnityObjectAsset))]
     public class UnityObjectDrawer : ObjectDrawer
     {
         private GameObject GetRootGo(GameObject gameObject)
@@ -148,7 +74,6 @@ namespace XPToolchains.Core
             if (Target == null)
             {
                 Target = new UnityObjectAsset();
-                Debug.Log("aaaaaaaaa");
             }
 
             UnityObjectAsset unityObject = Target as UnityObjectAsset;

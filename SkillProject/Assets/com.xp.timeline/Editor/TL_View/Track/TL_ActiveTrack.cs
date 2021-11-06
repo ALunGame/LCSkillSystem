@@ -5,11 +5,6 @@ using UnityEngine;
 
 namespace Timeline.Track
 {
-    public class TL_ActiveTrackData : TrackData
-    {
-        public string goAssetPath;
-    }
-
     /// <summary>
     /// 节点显示隐藏轨道
     /// </summary>
@@ -17,17 +12,7 @@ namespace Timeline.Track
     [TimelineTrack("显隐轨道", typeof(TL_ActiveClipView))]
     public class TL_ActiveTrackView : BaseTrackView
     {
-        public override string DisplayName => GetTrackGoName();
-
-        public string GetTrackGoName()
-        {
-            GameObject go = GetTrackGo();
-            if (go == null)
-            {
-                return "默认节点";
-            }
-            return go.name;
-        }
+        public override string DisplayName => "显隐轨道";
 
         public GameObject GetTrackGo()
         {

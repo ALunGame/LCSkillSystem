@@ -228,7 +228,7 @@ namespace XPToolchains.Extension
                 }
 
                 if (_fieldInfo != null
-                    && (AttributeHelper.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+                    && (AttributeHelper.TryGetFieldInfoAttribute(_fieldInfo, out FieldDrawerAttribute att)
                     || AttributeHelper.TryGetTypeAttribute(elementType, out att)))
                 {
                     for (int k = 0; k < list.Count; k++)
@@ -284,8 +284,23 @@ namespace XPToolchains.Extension
 
         private static object DrawSingleField(GUIContent _content, FieldInfo _fieldInfo, Type _fieldType, object _value)
         {
-            if (AttributeHelper.TryGetFieldInfoAttribute(_fieldInfo, out FieldAttribute att)
+            if (AttributeHelper.TryGetFieldInfoAttribute(_fieldInfo, out FieldDrawerAttribute att)
                 || AttributeHelper.TryGetTypeAttribute(_fieldType, out att))
+            {
+                ObjectDrawer objectDrawer;
+                if ((objectDrawer = ObjectDrawerPool.GetObjectDrawer(_fieldInfo)) != null)
+                {
+                    objectDrawer.Target = _value;
+                    objectDrawer.FieldInfo = _fieldInfo;
+                    objectDrawer.OnGUI(GUILayoutUtility.GetRect(EditorGUIUtility.labelWidth, objectDrawer.GetHeight()), _content);
+                    _value = objectDrawer.Target;
+                    return _value;
+                }
+            }
+
+            //自定义绘制器
+            Type customDrawer = ObjectDrawer.GetEditorType(_fieldType);
+            if (!customDrawer.Equals(typeof(ObjectDrawer)) && customDrawer.BaseType == typeof(ObjectDrawer))
             {
                 ObjectDrawer objectDrawer;
                 if ((objectDrawer = ObjectDrawerPool.GetObjectDrawer(_fieldInfo)) != null)

@@ -41,9 +41,6 @@ namespace XPToolchains.Core
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Class | AttributeTargets.Interface, Inherited = true)]
-    public sealed class FieldAttribute : Attribute { }
-
     /// <summary>
     /// EditorGUI面板绘制器
     /// </summary>
@@ -103,6 +100,14 @@ namespace XPToolchains.Core
             return objectEditor;
         }
 
+        public static bool CheckHasCustomDrawer(Type _objectType)
+        {
+            Type customDrawer = ObjectDrawer.GetEditorType(_objectType);
+            if (!customDrawer.Equals(typeof(ObjectDrawer)) && customDrawer.BaseType == typeof(ObjectDrawer))
+                return true;
+            return false;
+        }
+
         #endregion Static
 
         protected ObjectDrawer()
@@ -110,7 +115,7 @@ namespace XPToolchains.Core
         }
 
         public FieldInfo FieldInfo { get; set; }
-        public FieldAttribute Attribute { get; set; }
+        public FieldDrawerAttribute Attribute { get; set; }
         public object Target { get; set; }
         protected IReadOnlyList<FieldInfo> Fields { get; private set; }
 
