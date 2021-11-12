@@ -1,7 +1,9 @@
-﻿namespace Timeline.Player
+﻿using UnityEngine;
+
+namespace Timeline.Player
 {
     /// <summary>
-    /// 基础技能片段播放器
+    /// 基础片段播放器
     /// </summary>
     public class BaseClipPlayer : BasePlayer
     {
@@ -43,10 +45,11 @@
 
         private void StartPlay()
         {
-            if (isStart)
+            if (!isStart)
             {
-                OnStart();
                 isStart = true;
+                Debug.Log("StartPlay");
+                OnStart();
             }
         }
 
@@ -54,12 +57,14 @@
         {
             if (isStart)
             {
+                Debug.Log("Playing");
                 OnPlaying();
             }
         }
 
         private void EndPlay()
         {
+            Debug.Log("EndPlay");
             isStart = false;
             OnEnd();
         }

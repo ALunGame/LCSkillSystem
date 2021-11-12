@@ -49,10 +49,17 @@ namespace Timeline.View
 
         #region Virtual
 
-        public virtual Color UnSelectColor { get { return new Color32(23, 99, 166, 100); } }
-        public virtual Color SelectColor { get { return new Color32(34, 204, 242, 255); } }
-        public virtual Color DisplayNameColor { get { return new Color32(12, 24, 41, 255); } }
-        public virtual string DisplayName { get { return "Track"; } }
+        public virtual Color UnSelectColor
+        { get { return new Color32(23, 99, 166, 100); } }
+
+        public virtual Color SelectColor
+        { get { return new Color32(34, 204, 242, 255); } }
+
+        public virtual Color DisplayNameColor
+        { get { return new Color32(12, 24, 41, 255); } }
+
+        public virtual string DisplayName
+        { get { return "Track"; } }
 
         public virtual void OnDrawTrack()
         {
@@ -129,6 +136,8 @@ namespace Timeline.View
         {
             BaseTimelineView trackView = CreateView(GetType());
             trackView.SetData(Data);
+            ((BaseTrackView)trackView).IsSelected = false;
+
             Sequence.AddTrackView((BaseTrackView)trackView);
         }
 

@@ -21,6 +21,16 @@ namespace Timeline.Clip
             go.SetActive(data.isActive);
         }
 
+        public override void OnPlaying()
+        {
+            GameObject go = GetAnimGo();
+            if (go == null)
+                return;
+
+            TL_ActiveClipData data = (TL_ActiveClipData)View.Data;
+            go.SetActive(data.isActive);
+        }
+
         public override void OnEnd()
         {
             GameObject go = GetAnimGo();

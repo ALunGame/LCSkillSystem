@@ -17,10 +17,9 @@ namespace Timeline.Track
         public GameObject GetTrackGo()
         {
             var data = (TL_ActiveTrackData)Data;
-            if (string.IsNullOrEmpty(data.goAssetPath))
+            if (data.Go.Obj == null)
                 return null;
-            GameObject go = AssetDatabase.LoadAssetAtPath<GameObject>(data.goAssetPath);
-            return go;
+            return data.Go.Obj as GameObject;
         }
     }
 }

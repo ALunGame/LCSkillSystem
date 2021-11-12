@@ -1,12 +1,17 @@
-﻿namespace Timeline
+﻿using UnityEngine;
+using XPToolchains;
+
+namespace Timeline
 {
     public class TL_ActiveTrackData : TrackData
     {
-        public string goAssetPath;
+        [UnityAssetType(typeof(GameObject), true)]
+        public UnityObjectAsset Go;
     }
 
     public class TL_AnimTrackData : TrackData
     {
-        public string goAssetPath;
+        [UnityAssetType(typeof(GameObject), true)]
+        public UnityObjectAsset Go;
     }
 }

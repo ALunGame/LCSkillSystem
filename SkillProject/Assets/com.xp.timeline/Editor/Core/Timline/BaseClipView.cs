@@ -25,7 +25,8 @@ namespace Timeline.View
         }
     }
 
-    public enum ClipDragMode { None, Drag, Left, Right }
+    public enum ClipDragMode
+    { None, Drag, Left, Right }
 
     /// <summary>
     /// 片段视图（一个轨道包含多个片段）
@@ -35,14 +36,27 @@ namespace Timeline.View
     {
         #region Display
 
-        public virtual Color UnSelectColor { get { return new Color32(109, 140, 171, 255); } }
-        public virtual Color SelectColor { get { return new Color32(158, 203, 247, 255); } }
-        public virtual Color DisplayNameColor { get { return new Color32(12, 24, 41, 255); } }
-        public virtual string DisplayName { get { return "Clip"; } }
+        public virtual Color UnSelectColor
+        { get { return new Color32(109, 140, 171, 255); } }
+
+        public virtual Color SelectColor
+        { get { return new Color32(158, 203, 247, 255); } }
+
+        public virtual Color DisplayNameColor
+        { get { return new Color32(12, 24, 41, 255); } }
+
+        public virtual string DisplayName
+        { get { return "Clip"; } }
 
         #endregion Display
 
         private ClipDragMode dragMode;
+
+        public ClipDragMode DragMode
+        {
+            get { return dragMode; }
+            set { dragMode = value; }
+        }
 
         public BaseTrackView Track;
 
@@ -52,8 +66,11 @@ namespace Timeline.View
 
         public bool IsSelected = false;
 
-        protected virtual ClipData clipData { get { return Data as ClipData; } }
-        protected virtual BaseClipPlayer clipPlayer { get { return Player as BaseClipPlayer; } }
+        protected virtual ClipData clipData
+        { get { return Data as ClipData; } }
+
+        protected virtual BaseClipPlayer clipPlayer
+        { get { return Player as BaseClipPlayer; } }
 
         public override void OnInit()
         {
@@ -130,10 +147,7 @@ namespace Timeline.View
                     {
                         dragMode = ClipDragMode.None;
                     }
-                    break;
-
-                case EventType.MouseUp:
-                    if (dragMode == ClipDragMode.Drag)
+                    if (dragMode != ClipDragMode.None)
                     {
                         IsSelected = true;
                         OnSelect();
@@ -141,8 +155,10 @@ namespace Timeline.View
                         {
                             GenRightClickMenu();
                         }
-                        evt.Use();
                     }
+                    break;
+
+                case EventType.MouseUp:
                     dragMode = ClipDragMode.None;
                     break;
 
@@ -257,9 +273,14 @@ namespace Timeline.View
         {
             BaseTimelineView clipView = CreateView(GetType());
             clipView.SetData(Data);
+            ((BaseClipView)clipView).DragMode = ClipDragMode.None;
+            ((BaseClipView)clipView).IsSelected = false;
+
             ClipData clipData = (ClipData)clipView.Data;
-            clipData.StartTime += 1;
-            Track.AddClipView((BaseClipView)clipView);
+            clipData.StartTime += 2;
+            clipData.EndTime += 2;
+            clipData.DurationTime = clipData.EndTime - clipData.StartTime;
+            Track.AddClipView((BaseClipView)clipView, true);
         }
 
         public virtual void OnSelect()

@@ -121,6 +121,14 @@ namespace Timeline.View
             }
         }
 
+        public override void OnRunningTimeChange(double runningTime)
+        {
+            for (int i = 0; i < Tracklist.Count; i++)
+            {
+                Tracklist[i].OnRunningTimeChange(runningTime);
+            }
+        }
+
         public virtual void OnSelect()
         {
             XPToolchains.Extension.EditorInspectorExtension.DrawObjectInInspector(Data);
